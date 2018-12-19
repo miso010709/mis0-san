@@ -1,0 +1,56 @@
+//ピン番号を格納
+const int PINS[] = {8,7,6,5,4,3,2};
+
+//キーマッピング
+const char KEYMAP[3][4] = {{'#','7','4','1'},{'0','8','5','2'},{'*','9','6','3'}};
+
+//列
+int row = 0;
+int n_row = 0;
+
+//行
+int col = 0;
+
+int n_col = 0;
+
+//キーの状態（何も押されていない状態の時：False）
+boolean signal = false;
+
+void setup() {
+	Serial.begin(9600);
+	Serial.println("KEYPAD TEST");
+	
+	//入出力設定
+	for(int i=0; i<7; i++){
+		if(i <= 2){
+			pinMode(PINS[i], OUTPUT);
+			digitalWrite(PINS[i],1);
+		}else{
+			pinMode(PINS[i], INPUT);
+		}
+		
+	}
+}
+
+void loop(){
+	for(int i=0; i<3; i++){
+		digitalWrite(PINS[i], 0); //ピン8(X)からLOWにする
+		n_row = i;
+		for(int j=3; j<7; j++){
+			n_col = j;
+			//ピン5から読み込んでLOWのピンを探す
+			if(digitalRead(PINS[j]) == 0){
+			  row = n_row; //
+				col = n_col -3; //行番号
+				signal = true;
+			}
+		} 
+		digitalWrite(PINS[i], 1); //HIGHにもどす
+	}
+	
+	if(signal == true){
+		Serial.print(KEYMAP[row][col]);
+		signal = false;
+		delay(150);
+	}
+}
